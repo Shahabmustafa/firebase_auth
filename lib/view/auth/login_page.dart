@@ -1,7 +1,10 @@
+import 'package:company_name/utls/utils.dart';
 import 'package:company_name/widget/button.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:company_name/view/auth/sign_up.dart';
 import 'package:flutter/services.dart';
+import 'package:company_name/utls/utils.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -15,12 +18,25 @@ class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
+  final _auth = FirebaseAuth.instance;
+
   @override
   void dispose() {
     // TODO: implement dispose
     super.dispose();
     emailController.dispose();
     passwordController.dispose();
+  }
+
+  void Login(){
+    _auth.signInWithEmailAndPassword(
+        email: emailController.text.toString(),
+        password: passwordController.text.toString()
+    ).then((value){
+      utls().toastMessage(value.user!.email.toString());
+    }).onError((error, stackTrace){
+      utls().toastMessage(error.toString());
+    });
   }
 
   @override
@@ -89,6 +105,7 @@ class _LoginPageState extends State<LoginPage> {
                 title: 'Login',
                 onTap: (){
                   if(_formkey.currentState!.validate()){
+                    Login();
                   }
 
                 },
