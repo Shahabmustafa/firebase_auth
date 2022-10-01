@@ -37,7 +37,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
       setState(() {
         loading = false;
       });
-
     }).onError((error, stackTrace){
       utls().toastMessage(error.toString());
       setState(() {

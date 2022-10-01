@@ -1,4 +1,6 @@
+import 'package:company_name/post/post_screen.dart';
 import 'package:company_name/utls/utils.dart';
+import 'package:company_name/view/auth/login_with_phone_number.dart';
 import 'package:company_name/widget/button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +21,7 @@ class _LoginPageState extends State<LoginPage> {
   final passwordController = TextEditingController();
 
   final _auth = FirebaseAuth.instance;
+  bool loading= false;
 
   @override
   void dispose() {
@@ -29,13 +32,24 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void Login(){
+    setState(() {
+      loading = true;
+    });
     _auth.signInWithEmailAndPassword(
         email: emailController.text.toString(),
-        password: passwordController.text.toString()
+        password: passwordController.text.toString(),
     ).then((value){
+      setState(() {
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => PostScreen()));
+        loading = false;
+      });
       utls().toastMessage(value.user!.email.toString());
     }).onError((error, stackTrace){
+      debugPrint(error.toString());
       utls().toastMessage(error.toString());
+      setState(() {
+        loading = false;
+      });
     });
   }
 
@@ -103,9 +117,11 @@ class _LoginPageState extends State<LoginPage> {
               ),
               RoundButton(
                 title: 'Login',
+                  loading : loading,
                 onTap: (){
                   if(_formkey.currentState!.validate()){
                     Login();
+
                   }
 
                 },
@@ -121,6 +137,23 @@ class _LoginPageState extends State<LoginPage> {
                     Navigator.push(context, MaterialPageRoute(builder: (context)=> SignUpScreen() ));
                   }, child: Text("Sign Up")),
                 ],
+              ),
+              InkWell(
+                onTap: (){
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => loginWithPhoneNumber()));
+                },
+                child: Container(
+                  height: 50.0,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(50),
+                    border: Border.all(
+                      color: Colors.deepPurple
+                    ),
+                  ),
+                  child: Center(
+                      child: Text('Login With Phone'),
+                  ),
+                ),
               ),
             ],
           ),
